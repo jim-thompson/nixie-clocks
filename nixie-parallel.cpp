@@ -1,20 +1,32 @@
+//-----------------------------------------------------------------------
+// nixie-parallel.cpp - Write time values out for the vintage clock.
+// with a set of four output bits/pins.
+
+// Copyright (c) 2017 Jim Thompson.
+
+//-----------------------------------------------------------------------
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 #include <Arduino.h>
-#include "nixie-parallel.h"
+#include "FourBitDigit.h"
 
-extern unsigned char SECOND;
-extern unsigned char MINUTE;
-extern unsigned char HOUR;
+extern unsigned int second;
+extern unsigned int minute;
+extern unsigned int hour;
 
-// FourBitDigit hour_ones_digit(34, 36, 38, 40);
-// FourBitDigit hour_tens_digit(35, 37, 39, 41);
-
-// FourBitDigit minute_ones_digit(42, 44, 46, 48);
-// FourBitDigit minute_tens_digit(43, 45, 47, 49);
-
-// FourBitDigit second_ones_digit(46, 48, 50, 52);
-// FourBitDigit second_tens_digit(47, 49, 51, 53);
-
-
+// Declare the objects representing each of the six digits and their
+// corresponding I/O pins.
 FourBitDigit second_ones_digit(46, 50, 52, 48);
 FourBitDigit second_tens_digit(47, 49, 51, 53);
 FourBitDigit minute_ones_digit(38, 42, 44, 40);
@@ -22,71 +34,19 @@ FourBitDigit minute_tens_digit(39, 41, 43, 45);
 FourBitDigit hour_ones_digit(30, 34, 36, 32);
 FourBitDigit hour_tens_digit(31, 33, 35, 37);
 
-
-void setDigit(FourBitDigit &digit, unsigned int value)
-{
-  digit.setValue(value);
-  digit.writePins();
-}
-
-void setAllDigits(int value)
-{
-  setDigit(hour_tens_digit, value);
-  setDigit(hour_ones_digit, value);
-  setDigit(minute_tens_digit, value);
-  setDigit(minute_ones_digit, value);
-  setDigit(second_tens_digit, value);
-  setDigit(second_ones_digit, value);
-}
-
-void setTestPattern1()
-{
-  setDigit(hour_tens_digit, 1);
-  setDigit(hour_ones_digit, 2);
-  setDigit(minute_tens_digit, 3);
-  setDigit(minute_ones_digit, 4);
-  setDigit(second_tens_digit, 5);
-  setDigit(second_ones_digit, 6);
-}
-
-void setTestPattern2()
-{
-  setDigit(hour_tens_digit, 6);
-  setDigit(hour_ones_digit, 5);
-  setDigit(minute_tens_digit, 4);
-  setDigit(minute_ones_digit, 3);
-  setDigit(second_tens_digit, 2);
-  setDigit(second_ones_digit, 1);
-}
-
-extern void test()
-{
-  Serial.println("In test routine");
-  while (true)
-    {
-      for (int i = 0; i < 10; i++)
-	{
-	  setAllDigits(i);
-	  delay(1000);
-	}
-
-      setTestPattern1();
-      delay(1000);
-
-      setTestPattern2();
-      delay(1000);
-    }
-}
-
+// Write all the values in parallel
 extern void nixie_writeall()
 {
-  unsigned int second_ones = SECOND % 10;
-  unsigned int second_tens = ((SECOND / 10) % 10);
-  unsigned int minute_ones = MINUTE % 10;
-  unsigned int minute_tens = ((MINUTE / 10) % 10);
-  unsigned int hour_ones = HOUR % 10;
-  unsigned int hour_tens = ((HOUR / 10) % 10);
+  // Get the values for the six digits from the time values for hours,
+  // minutes, and seconds.
+  unsigned int second_ones = second % 10;
+  unsigned int second_tens = ((second / 10) % 10);
+  unsigned int minute_ones = minute % 10;
+  unsigned int minute_tens = ((minute / 10) % 10);
+  unsigned int hour_ones = hour % 10;
+  unsigned int hour_tens = ((hour / 10) % 10);
 
+  // Set the values in the digit objects.
   second_ones_digit.setValue(second_ones);
   second_tens_digit.setValue(second_tens);
   minute_ones_digit.setValue(minute_ones);
@@ -94,6 +54,7 @@ extern void nixie_writeall()
   hour_ones_digit.setValue(hour_ones);
   hour_tens_digit.setValue(hour_tens);
 
+  // Write them all out to their various I/O pins.
   second_ones_digit.writePins();
   second_tens_digit.writePins();
   minute_ones_digit.writePins();

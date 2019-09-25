@@ -5,7 +5,9 @@ ARDUINO_QUIET = t
 
 #BOARD_TAG = uno
 #MONITOR_PORT = /dev/tty.wchusbserial143340
-MONITOR_PORT = /dev/tty.usbmodem143341
+#MONITOR_PORT = /dev/tty.usbmodem143341
+#MONITOR_PORT = /dev/tty.usbmodemFD121
+MONITOR_PORT = /dev/cu.usbserial-14340
 
 BOARD_TAG    = mega
 BOARD_SUB    = atmega2560
